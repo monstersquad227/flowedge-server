@@ -12,6 +12,8 @@ github.com/monstersquad227/flowedge-proto v0.0.0-20250430063156-8e32061168b9 h1:
 github.com/monstersquad227/flowedge-proto v0.0.0-20250430063156-8e32061168b9/go.mod h1:wsgkjwXXer5P/p8K9y39NQGpJUDovuLLC1Tu6spMR0A=
 github.com/monstersquad227/flowedge-proto v0.0.0-20250506025842-044c1c851acc h1:xAftz4PGf5lk3hTBLWL2XvyL6psdtaJwk4H3xdCAZ4g=
 github.com/monstersquad227/flowedge-proto v0.0.0-20250506025842-044c1c851acc/go.mod h1:wsgkjwXXer5P/p8K9y39NQGpJUDovuLLC1Tu6spMR0A=
+github.com/monstersquad227/flowedge-proto v0.0.0-20250506094424-76ec1da29134 h1:KEZSPsZaAraIwAE5or6c7kRVodhGLuWHbDghmoID3c0=
+github.com/monstersquad227/flowedge-proto v0.0.0-20250506094424-76ec1da29134/go.mod h1:wsgkjwXXer5P/p8K9y39NQGpJUDovuLLC1Tu6spMR0A=
 go.opentelemetry.io/auto/sdk v1.1.0 h1:cH53jehLUN6UFLY71z+NDOiNJqDdPRaXzTel0sJySYA=
 go.opentelemetry.io/auto/sdk v1.1.0/go.mod h1:3wSPjt5PWp2RhlCcmmOial7AvC4DQqZb7a7wCow3W8A=
 go.opentelemetry.io/otel v1.34.0 h1:zRLXxLCgL1WyKsPVrgbSdMN4c0FMkDAskSTQP+0hdUY=

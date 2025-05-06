@@ -3,7 +3,7 @@ module flowedge-server
 go 1.24.2
 
 require (
-	github.com/monstersquad227/flowedge-proto v0.0.0-20250506025842-044c1c851acc // indirect
+	github.com/monstersquad227/flowedge-proto v0.0.0-20250506094424-76ec1da29134 // indirect
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect

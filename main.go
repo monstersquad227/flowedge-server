@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/google/uuid"
 	pb "github.com/monstersquad227/flowedge-proto"
 	"google.golang.org/grpc"
 	"io"
@@ -57,6 +58,8 @@ func main() {
 	http.HandleFunc("/execute", func(w http.ResponseWriter, r *http.Request) {
 		agentID := r.URL.Query().Get("agent_id")
 		command := r.URL.Query().Get("command")
+		containerID := r.URL.Query().Get("container_id")
+		image := r.URL.Query().Get("image")
 		//if agentID == "" || command == "" {
 		//	http.Error(w, "agent_id and command required", http.StatusBadRequest)
 		//	return
@@ -71,8 +74,10 @@ func main() {
 			Type: pb.MessageType_EXECUTE_REQUEST,
 			Body: &pb.StreamMessage_ExecuteRequest{
 				ExecuteRequest: &pb.ExecuteRequest{
-					CommandId:    "cmd-http-001",
-					ShellCommand: command,
+					CommandId:   uuid.New().String(),
+					Command:     command,
+					Image:       image,
+					ContainerId: containerID,
 				},
 			},
 		})

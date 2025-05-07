@@ -9,11 +9,13 @@ import (
 	"net"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type server struct {
 	pb.UnimplementedFlowEdgeServer
-	streams sync.Map
+	streams         sync.Map
+	pendingResponse sync.Map
 }
 
 func (s *server) Communicate(stream pb.FlowEdge_CommunicateServer) error {
@@ -48,6 +50,12 @@ func (s *server) Communicate(stream pb.FlowEdge_CommunicateServer) error {
 		case pb.MessageType_EXECUTE_RESPONSE:
 			r := msg.GetExecuteResponse()
 			log.Printf("Execution result: %s, output: %s, error: %s", r.CommandId, r.Output, r.Error)
+
+			if chVal, ok := s.pendingResponse.Load(r.CommandId); ok {
+				ch := chVal.(chan *pb.ExecuteResponse)
+				ch <- r
+				s.pendingResponse.Delete(r.CommandId)
+			}
 		}
 	}
 }
@@ -69,12 +77,17 @@ func main() {
 			http.Error(w, "agent not connected", http.StatusNotFound)
 			return
 		}
+		commandID := uuid.New().String()
+
+		respCh := make(chan *pb.ExecuteResponse, 1)
+		Server.pendingResponse.Store(commandID, respCh)
+
 		stream := streamVal.(pb.FlowEdge_CommunicateServer)
 		err := stream.Send(&pb.StreamMessage{
 			Type: pb.MessageType_EXECUTE_REQUEST,
 			Body: &pb.StreamMessage_ExecuteRequest{
 				ExecuteRequest: &pb.ExecuteRequest{
-					CommandId:   uuid.New().String(),
+					CommandId:   commandID,
 					Command:     command,
 					Image:       image,
 					ContainerId: containerID,
@@ -85,7 +98,16 @@ func main() {
 			http.Error(w, "failed to send command: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		w.Write([]byte("Command sent to agent " + agentID))
+
+		select {
+		case resp := <-respCh:
+			w.Write([]byte("Command executed\nOutput: " + resp.Output + "\nError: " + resp.Error))
+		case <-time.After(20 * time.Second):
+
+			Server.pendingResponse.Delete(commandID)
+			http.Error(w, "timeout waiting for agent response", http.StatusGatewayTimeout)
+		}
+		//w.Write([]byte("Command sent to agent " + agentID))
 	})
 
 	go func() {

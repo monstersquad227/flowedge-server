@@ -1,10 +1,14 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"github.com/google/uuid"
 	pb "github.com/monstersquad227/flowedge-proto"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -115,12 +119,32 @@ func main() {
 		log.Fatal(http.ListenAndServe(":8080", nil))
 	}()
 
+	// 加载服务端证书
+	cert, err := tls.LoadX509KeyPair("./certs/server.crt", "./certs/server.key")
+	if err != nil {
+		log.Fatalf("Failed to load server cert: %v", err)
+	}
+	// 加载客户端 CA 证书
+	caCert, err := ioutil.ReadFile("./certs/ca.crt")
+	if err != nil {
+		log.Fatalf("Failed to read CA cert: %v", err)
+	}
+	caPool := x509.NewCertPool()
+	caPool.AppendCertsFromPEM(caCert)
+	// 创建 TLS 配置
+	creeds := credentials.NewTLS(&tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    caPool,
+	})
+
+	s := grpc.NewServer(grpc.Creds(creeds))
+
 	// 启动 gRPC 服务器
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
 
 	pb.RegisterFlowEdgeServer(s, Server)
 	log.Println("Server listening on :50051")

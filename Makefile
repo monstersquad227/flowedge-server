@@ -39,7 +39,7 @@ subjectAltName = @alt_names \n\
 DNS.1 = localhost \n\
 IP.1 = 127.0.0.1 \n\
 IP.2 = 10.11.11.56 \n\
-IP.2 = 47.103.98.61 \n\
+IP.3 = 47.103.98.61 \n\
 " > ./$(DIR)/openssl-san.cnf
 	@echo "✅ openssl-san.cnf file complete."
 	@echo "👉 Generate server file..."
